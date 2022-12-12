@@ -1,6 +1,10 @@
 from flask import Flask
 from flask_mail import Mail, Message
 
+from utils import load_okr_json, get_check_in_msg
+
+OKR_JSON = load_okr_json()
+
 app = Flask(__name__)
 mail= Mail(app)
 
@@ -12,11 +16,17 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
+def send_message(recipient_email, recipient_okrs):
+   msg = Message('Check-In', sender = app.config['MAIL_USERNAME'], recipients = [recipient_email])
+   msg.subject = "Wie geht es dir?"
+   msg.body = get_check_in_msg(recipient_okrs)
+   mail.send(msg)
+
+
 @app.route("/")
 def index():
-   msg = Message('Hello', sender = app.config['MAIL_USERNAME'], recipients = ['alex.gansmann@hey.com'])
-   msg.body = "Hello Flask message sent from Flask-Mail"
-   mail.send(msg)
+   for user in OKR_JSON["users"]:
+      send_message(user["email"], user["okrs"])
    return "Sent"
 
 if __name__ == '__main__':

@@ -11,6 +11,7 @@ ENV TZ=Europe/Berlin
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # mount relevant directories
-COPY ./src .
+COPY ./src ./src
+COPY ./data/raw ./data/raw
 
-CMD python run_mailer.py
+CMD python src/run_mailer.py
